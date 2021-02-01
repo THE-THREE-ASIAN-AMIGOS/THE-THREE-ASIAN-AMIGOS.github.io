@@ -115,7 +115,13 @@ if (NotOver) {
     if (LinePositions.length == UsePositions.length) {
         context.fillText("You Have Won The Game. Press y to restart the game", 300, 400);
         NotOver = false;
-        let frame = document.createElement("iframe")
+        document.onkeydown = (e) => {
+            if (e.key == "y") {
+                let Audio = document.createElement("audio");
+                Audio.src = "audio.mp3";
+                Audio.play();
+            }
+        }
     }
 }
 }
@@ -123,6 +129,5 @@ if (NotOver) {
 window.addEventListener("keypress", Game);
 
 </script>
-<iframe width="560" height="315" id="frame" src="https://youtube/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </body>
 </html>
