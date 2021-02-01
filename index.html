@@ -6,6 +6,8 @@
 </head>
 <body>
 <canvas id="canvas"></canvas>
+<h4>Wrong Guesses</h4>
+<p id="wrong"></p>
 <script>
     const canvas = document.getElementById("canvas");
 canvas.height = 600;
@@ -123,6 +125,8 @@ if (NotOver) {
             }
         }
     }
+
+    document.getElementById("wrong").innerHTML = WrongGuess.join(", ");
 }
 }
 
