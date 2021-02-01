@@ -95,7 +95,7 @@ if (WrongGuess.length == 5) {
 
 DisplayShit();
 
-var Game = (e) => {
+document.onkeypress = (e) => {
 if (NotOver) {
     let letter = String(e.key).toLowerCase();
     let i = ChosenWord.indexOf(letter);
@@ -130,8 +130,6 @@ if (NotOver) {
     document.getElementById("wrong").innerHTML = WrongGuess.join(", ");
 }
 }
-
-window.addEventListener("keypress", Game);
 
 </script>
 </body>
