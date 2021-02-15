@@ -1,305 +1,136 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<h4>Wrong Guesses</h4>
+<p id="wrong"></p>
+<script>
+    const canvas = document.getElementById("canvas");
+canvas.height = 600;
+canvas.width = 800;
+const context = canvas.getContext("2d");
 
-<html>
-    <head>
-        <title>Bingo</title>
-        <style>
-            .Row {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-evenly;
+context.fillStyle = "rgb(0, 0, 0)";
+context.font = " 20px Arial";
+
+//Creates arrays that holds the word list, right guess, and wrong guess
+var WordList = ["because", "world", "school", "schools", "military", "python", "text", "programming", "program", "electric", "computers", "computer", "ball", "soccer", "smash", "board", "white", "black", "blackboard", "whiteboard", "aim", "alive", "all", "alcohol", "airport", "ahead", "afternoon", "afraid", "air", "agency", "agricultural", "mochi", "museum", "sad", "king", "echo", "little", "kiwi", "toast", "weather", "toaster", "the", "map", "gummy", "bear", "fox", "army", "beer", "shoe", "shoes", "shoot", "shooting"];
+var RightGuess = new Array();
+var WrongGuess = new Array();
+var alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+var NotOver = true;
+
+var ChosenWord = WordList[Math.floor(Math.random() * WordList.length)];
+
+var LinePositions = new Array();
+var UsePositions = new Array();
+
+for (let i = 0; i < ChosenWord.length; ++i) {
+LinePositions.push(400 + (i * 30));
+}
+
+var NotDrawn = true;
+
+var amount = 1;
+
+function DisplayShit() {
+if (NotDrawn) {
+    context.moveTo(360, 300);
+    context.lineTo(440, 300);
+    context.moveTo(400, 300);
+    context.lineTo(400, 200);
+    context.lineTo(440, 200);
+    context.lineTo(440, 210);
+    context.stroke();
+    NotDrawn = false;
+}
+
+for (let i = 0; i < ChosenWord.length; i++) {
+    context.moveTo(LinePositions[i], 350);
+    if (RightGuess.indexOf(ChosenWord[i]) > -1) {
+        if (UsePositions.length <= 0 || UsePositions.indexOf(LinePositions[i]) === -1) {
+            context.fillText(ChosenWord[i], LinePositions[i] + 5, 350);
+            UsePositions.push(LinePositions[i]);
+        }
+    }
+    context.fillRect(LinePositions[i],350, 20, 1);
+}
+
+if (WrongGuess.length == 1) {
+    context.beginPath();
+    context.arc(440, 220, 10, 0,2*Math.PI,false);
+    context.closePath();
+    context.stroke();
+}
+if (WrongGuess.length == 2) {
+    context.fillRect(440, 230, 1, 30);
+}
+if (WrongGuess.length == 3) {
+    context.fillRect(420, 240, 40, 1);
+}
+if (WrongGuess.length == 4) {
+    context.moveTo(440, 260);
+    context.lineTo(450, 270);
+    context.stroke();
+}
+if (WrongGuess.length == 5) {
+    context.moveTo(440, 260);
+    context.lineTo(430, 270);
+    context.stroke();
+    context.fillText("You Have Lost To The Easiest Game Ever.", 300, 400);
+    context.fillText("The Word Was: " + ChosenWord, 300, 450);
+    context.fillText("Press y to restart", 300, 500);
+    NotOver = false;
+    window.addEventListener("keydown", (e) => {
+        if (e.key == "y" || e.key == "Y") {
+            window.location.reload();
+        }
+    });
+}
+}
+
+DisplayShit();
+
+document.onkeypress = (e) => {
+if (NotOver) {
+    let letter = String(e.key).toLowerCase();
+    let i = ChosenWord.indexOf(letter);
+
+    if (alphabet.indexOf(letter) > -1) {
+        if (i >= 0) {
+            RightGuess.push(letter);
+        } else {
+            if (WrongGuess.indexOf(letter) == -1) {
+                WrongGuess.push(letter);
             }
+        }
+    }
 
-            #Top {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-evenly;
-                padding-left: 0;
-                padding-right: 0;
-                margin-left: auto;
-                margin-right: auto;
-                width: 20vw;
+    console.log(RightGuess);
+    console.log(WrongGuess);
+    DisplayShit();
+
+    if (LinePositions.length == UsePositions.length) {
+        context.fillText("You Have Won The Game. Press y to restart the game", 300, 400);
+        NotOver = false;
+        document.onkeydown = (e) => {
+            if (e.key == "y") {
+                let Audio = document.createElement("audio");
+                Audio.src = "audio.mp3";
+                Audio.autoplay = true;
+                Audio.play();
             }
+        }
+    }
 
-            #Number {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-evenly;
-                padding-left: 0;
-                padding-right: 0;
-            }
+    document.getElementById("wrong").innerHTML = WrongGuess.join(", ");
+}
+}
 
-            .board {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-evenly;
-                background-color: white;
-                height: 30vh;
-                width: 20vw;
-                padding-left: 0;
-                padding-right: 0;
-            }
-
-            .Right {
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-            }
-
-            .item {
-                height: 20px;
-                width: 20px;
-                background-color: black;
-                border: 5px solid red;
-            }
-
-            .letter {
-                height: 20px;
-                width: 20px;
-            }
-
-            .red {
-                height: 20px;
-                width: 20px;
-                border: 5px solid red;
-                background-color: red;
-            }
-        </style>
-    </head>
-    <body style="background-color: aquamarine;">
-        <div id="game" style="display: none;">
-            <div id="Top">
-                <div class="letter" id="Letter1">B</div>
-                <div class="letter" id="Letter2">I</div>
-                <div class="letter" id="Letter3">N</div>
-                <div class="letter" id="Letter4">G</div>
-                <div class="letter" id="Letter5">O</div>
-            </div>
-            <div class="Right">
-                <div id="Number">
-                    <div class="letter">1</div>
-                    <div class="letter">2</div>
-                    <div class="letter">3</div>
-                    <div class="letter">4</div>
-                    <div class="letter">5</div>
-                </div>
-                <div class="board">
-                    <div class="Row">
-                        <div id="1" class="item"></div>
-                        <div id="2" class="item"></div>
-                        <div id="3" class="item"></div>
-                        <div id="4" class="item"></div>
-                        <div id="5" class="item"></div>
-                    </div>
-                    <div class="Row">
-                        <div id="6" class="item"></div>
-                        <div id="7" class="item"></div>
-                        <div id="8" class="item"></div>
-                        <div id="9" class="item"></div>
-                        <div id="10" class="item"></div>
-                    </div>
-                    <div class="Row">
-                        <div id="11" class="item"></div>
-                        <div id="12" class="item"></div>
-                        <div id="13" class="item"></div>
-                        <div id="14" class="item"></div>
-                        <div id="15" class="item"></div>
-                    </div>
-                    <div class="Row">
-                        <div id="16" class="item"></div>
-                        <div id="17" class="item"></div>
-                        <div id="18" class="item"></div>
-                        <div id="19" class="item"></div>
-                        <div id="20" class="item"></div>
-                    </div>
-                    <div class="Row">
-                        <div id="21" class="item"></div>
-                        <div id="22" class="item"></div>
-                        <div id="23" class="item"></div>
-                        <div id="24" class="item"></div>
-                        <div id="25" class="item"></div>
-                    </div>
-                </div>
-            </div>
-            <div style="display: block; justify-content: space-around;">
-                <h2 id="win" style="display: none;">You Have Won</h2>
-            </div>
-        </div>
-        <div id="admin" style="display: none;">
-            <button onclick="x()">Get Random</button>
-            <hr>
-            <h3>Result</h3>
-            <p id="result"> </p>
-            <hr>
-            <h3>Already Done</h3>
-            <p id="done"> </p>
-            <hr>
-            <h3>Check if Used</h3>
-            <input id="input" type="text" placeholder="Type Here. Press enter when done" style="width: 16em;">
-            <button onclick="check()">Submit</button>
-            <p id="true"> </p>
-        </div>
-        <script>
-            var choice = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
-            const urlParams = new URLSearchParams(window.location.search);
-            let answer = parseInt(urlParams.get('admin'));
-            if (isNaN(answer)) {
-                game();
-            } else if (answer == 1) {
-                document.getElementById("admin").style.display = "block";
-            }
-
-            function game() {
-                let board = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]];
-                console.log(board);
-                document.getElementById("game").style.display = "block";
-                
-                for (let i = 1; i <= 5; ++i) {
-                    document.getElementById("Letter" + String(i)).innerHTML = choice[Math.floor(Math.random() * choice.length)].toUpperCase();
-                }
-
-                for (let x = 0; x < 5; ++x) {
-                    for (let y = 0; y < 5; ++y) {
-                        document.getElementById(String(((x * 5) + y) + 1)).onclick = () => {
-                            document.getElementById(String(((x * 5) + y)  + 1)).className = "red";
-                            let idk = check(y, x);
-                            if (idk == true) {
-                                document.getElementById("win").style.display = "block";
-                            }
-                        }
-                    }
-                }
-
-                function check(y, x) {
-                    board[y][x] = 1;
-                    console.log(board);
-                    let amount = 0;
-                    
-                    for (let i = 0; i < 5; ++i) {
-                        for (let j = 0; j < 5; ++j) {
-                            if (board[i][j] == 1) {
-                                ++amount;
-                            }
-                        }
-                    }
-
-                    if (amount >= 5) {
-                        let result = Vertical();
-                        if (result == true) {
-                            document.getElementById("win").style.display = "block";
-                        }
-                        result = Horizontal();
-                        if (result == true) {
-                            document.getElementById("win").style.display = "block";
-                        }
-                        result = Diagonal();
-                        if (result == true) {
-                            document.getElementById("win").style.display = "block";
-                        }
-                    }
-
-                    //vertical
-                    function Vertical() {
-                        let amount = 0;
-                        for (let i = 0; i < 5; ++i) {
-                            for (let j = 0; j < 5; ++j) {
-                                if (board[i][j] == 1) {
-                                    ++amount;
-                                    if (amount >= 5) {
-                                        return true;
-                                    }
-                                }
-                            }
-                            amount = 0;
-                        }
-                    }
-
-                    //horizontal
-                    function Horizontal() {
-                        let amount = 0;
-                        for (let i = 0; i < 5; ++i) {
-                            for (let j = 0; j < 5; ++j) {
-                                if (board[j][i] == 1) {
-                                    ++amount;
-                                    if (amount >= 5) {
-                                        return true;
-                                    }
-                                }
-                            }
-                            amount = 0;
-                        }
-                    }
-
-                    //diagonal
-                    function Diagonal() {
-                        let amount = 0;
-                        let right = true;
-                        let left = true;
-                        for (let runs = 0; runs < 5; ++runs) {
-                            if (right == true) {
-                                for (let x = 0, y = 0; x < 5 && y < 5; ++x, ++y) {
-                                    if (board[y][x] == 1) {
-                                        ++amount;
-                                    }
-                                    if (amount == 5) {
-                                        return true;
-                                    }
-                                    if (x == 4 && y == 4) {
-                                        amount = 0;
-                                        right = false;
-                                        left = true;
-                                    }
-                                }
-                            }
-                            if (left == true) {
-                                for (let x = 4, y = 0; x > -1 && y < 5; --x, ++y) {
-                                    if (board[y][x] == 1) {
-                                        ++amount;
-                                    }
-                                    if (amount == 5) {
-                                        return true;
-                                    }
-                                    if (x == 0 && y == 4) {
-                                        amount = 0;
-                                        right = false;
-                                        left = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            function check() {
-                let input = document.getElementById("input").value;
-                let Values = input.match(/.{1,2}/g);
-                console.log(Values);
-                let count = 0;
-                for (let i = 0; i < Values.length; ++i) {
-                    if (random.indexOf(Values[i]) >= 0) {
-                        ++count;
-                    }
-                }
-                if (count == 5) {
-                    document.getElementById("true").innerHTML = "true";
-                } else {
-                    document.getElementById("true").innerHTML = "false";
-                }
-            }
-
-            let random = [];
-            function x() {
-                let number = Math.floor(Math.random() * 5) + 1;
-                let done = false;
-                let letter = choice[Math.floor(Math.random() * choice.length)].toUpperCase()
-                if (random.length == 0 || random.indexOf(letter + String(number)) < 0) {
-                    document.getElementById("result").innerHTML = letter + String(number);
-                    random.push(letter + String(number));
-                    done = true;
-                }
-                document.getElementById("done").innerHTML = random.join(", ");
-            }
-        </script>
-    </body>
+</script>
+</body>
 </html>
